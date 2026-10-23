@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.venv/
+.cache/
+.data/
+.deploy/
+__pycache__/
+*.py[cod]
+*.log
+log/
+logs/

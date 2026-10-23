@@ -1,0 +1,23 @@
+{
+    "The Borderland Ruins" :{
+        "name":"周边遗迹群（阵地战）",
+        "image":"image/周边遗迹群.png"
+    },
+    "Seal Rock":{
+        "name":"尘封秘岩（争夺战）",
+        "image":"image/尘封秘岩.png"
+    },
+    "The Fields of Glory":{
+        "name":"荣誉野（碎冰战）",
+        "image":"image/荣誉野.png"
+    },
+    "Onsal Hakair":{
+        "name":"昂萨哈凯尔（竞争战）",
+        "image":"image/昂萨哈凯尔.png"
+    },
+    "Worqor Chirteh":{
+        "name":"沃刻其特（演习战）",
+        "image":"image/沃刻其特.png"
+    }
+
+}

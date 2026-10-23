@@ -1,0 +1,4 @@
+qq-botpy==1.2.1
+python-dotenv==1.2.4
+Pillow==13.0.0; python_version >= "3.11"
+Pillow==12.0.0; python_version < "3.11"

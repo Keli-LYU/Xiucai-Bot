@@ -1,0 +1,26 @@
+[Unit]
+Description=QQ robot
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=120
+StartLimitBurst=10
+
+[Service]
+Type=simple
+User=qqbot
+Group=qqbot
+WorkingDirectory=/opt/qq-bot/current
+ExecStart=/opt/qq-bot/current/.venv/bin/python /opt/qq-bot/current/bot.py
+Environment=PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8 PYTHONDONTWRITEBYTECODE=1 LANG=C.UTF-8 TZ=Asia/Shanghai
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/qq-bot/shared
+
+[Install]
+WantedBy=multi-user.target
