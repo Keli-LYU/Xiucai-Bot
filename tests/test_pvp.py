@@ -11,10 +11,30 @@ from PIL import Image
 
 from bot import HelloBot
 from local_images import read_image
-from pvp import BEIJING, DATA_DIR, get_today_battlefield, is_pvp_command, resolve_image_path
+from pvp import BEIJING, DATA_DIR, get_today_battlefield, is_pvp_command, parse_predict_time, resolve_image_path
 
 
 class RotationTests(unittest.TestCase):
+    def test_predict_parses_beijing_hour_and_leap_day(self):
+        self.assertEqual(parse_predict_time("2028-02-29-9"), datetime(2028, 2, 29, 9, tzinfo=BEIJING))
+        self.assertEqual(parse_predict_time("2028-02-29-09"), parse_predict_time("2028-02-29-9"))
+        self.assertEqual(parse_predict_time("2026-10-28-00").astimezone(timezone.utc),
+                         datetime(2026, 10, 27, 16, tzinfo=timezone.utc))
+
+    def test_predict_rejects_invalid_dates_hours_and_formats(self):
+        for value in ("2026-02-29-9", "2026-04-31-9", "2026-10-28-24", "0000-01-01-0",
+                      "2026-13-01-9", "2026-10-28--1", "2026-1-01-9", "2026-10-28",
+                      "2026-10-28-09:00", "２０２６-10-28-9"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                parse_predict_time(value)
+
+    def test_predict_supported_date_endpoints_do_not_overflow(self):
+        for value in ("0001-01-01-0", "9999-12-31-22", "9999-12-31-23"):
+            with self.subTest(value=value):
+                battle = get_today_battlefield(parse_predict_time(value))
+                self.assertTrue(battle["name"])
+                self.assertIn(battle["time_until_rotation"], ("1小时0分钟0秒", "23小时0分钟0秒", "24小时0分钟0秒"))
+
     def test_configured_local_images_exist(self):
         info = json.loads((DATA_DIR / "info.json").read_text(encoding="utf-8-sig"))
         for battle in info.values():
@@ -120,6 +140,47 @@ class ReplyTests(unittest.IsolatedAsyncioTestCase):
                       "force_verify_image_resource": True},
         )
         self.http.request.assert_not_awaited()
+
+    async def test_predict_group_uses_requested_hour_and_rotation_boundary(self):
+        for hour, name, next_name, remaining in (
+                (22, "昂萨哈凯尔（竞争战）", "沃刻其特（演习战）", "1小时0分钟0秒"),
+                (23, "沃刻其特（演习战）", "尘封秘岩（争夺战）", "24小时0分钟0秒")):
+            with self.subTest(hour=hour):
+                self.api.post_group_message.reset_mock()
+                self.group.content = f"<@!123> /predict 2026-10-23-{hour}"
+                def battle_at(when):
+                    return {**get_today_battlefield(when), "image": str(self.image_path)}
+                with patch("bot.get_today_battlefield", side_effect=battle_at) as lookup:
+                    await self.client.on_group_at_message_create(self.group)
+                lookup.assert_called_once_with(datetime(2026, 10, 23, hour, tzinfo=BEIJING))
+                content = self.api.post_group_message.await_args.kwargs["markdown"]["content"]
+                self.assertIn(f"查询时间：2026-10-23 {hour}:00（北京时间）", content)
+                self.assertIn(f"此时战场：{name}", content)
+                self.assertIn(f"{remaining}后轮换至{next_name}", content)
+                self.assertIn("![战场图片 #800px #250px]", content)
+                self.api.post_group_message.assert_awaited_once()
+
+    async def test_predict_private_reply_and_image_failure_keep_query_time(self):
+        self.c2c.content = "/predict 2028-02-29-9"
+        self.client.markdown_images.get_url.side_effect = RuntimeError("image unavailable")
+        with self.assertLogs("hello_bot", level="WARNING"):
+            await self.client.on_c2c_message_create(self.c2c)
+        reply = self.api.post_c2c_message.await_args.kwargs
+        self.assertIn("查询时间：2028-02-29 09:00（北京时间）", reply["markdown"]["content"])
+        self.assertIn(f"此时战场：{self.battle['name']}", reply["markdown"]["content"])
+        self.assertEqual(reply["msg_seq"], 2)
+
+    async def test_invalid_predict_never_loads_battlefield_or_image(self):
+        for command in ("/predict", "/predict 2026-10-28-23 extra", "/predict 2026-02-29-9", "/predict 2026-10-28-24"):
+            with self.subTest(command=command):
+                self.api.post_group_message.reset_mock()
+                self.group.content = command
+                with patch("bot.get_today_battlefield") as lookup:
+                    await self.client.on_group_at_message_create(self.group)
+                lookup.assert_not_called()
+                self.client.markdown_images.get_url.assert_not_awaited()
+                self.api.post_group_message.assert_awaited_once()
+                self.assertIn("/predict", self.api.post_group_message.await_args.kwargs["markdown"]["content"])
 
     async def test_c2c_combines_image_and_text(self):
         await self.client.on_c2c_message_create(self.c2c)

@@ -9,7 +9,7 @@ from botpy.message import C2CMessage, GroupMessage, Message
 from dotenv import load_dotenv
 
 from markdown_images import MarkdownImageStore
-from pvp import get_today_battlefield, parse_command, resolve_image_path
+from pvp import get_today_battlefield, parse_command, parse_predict_time, resolve_image_path
 from replies import ReplySession
 from xiucai import choose_xiucai_image
 
@@ -63,6 +63,19 @@ class HelloBot(botpy.Client):
             await replies.text(f"xiucai_trigger：{status}")
         elif command == "/pvp":
             await self._reply_pvp(replies)
+        elif command.split()[:1] == ["/predict"]:
+            await self._reply_predict(replies, command.split()[1:])
+
+    async def _reply_predict(self, replies: ReplySession, arguments):
+        if len(arguments) != 1:
+            await replies.text("用法：/predict yyyy-mm-dd-hh，例如 /predict 2026-10-28-23；时间为北京时间。")
+            return
+        try:
+            when = parse_predict_time(arguments[0])
+        except ValueError as exc:
+            await replies.text(str(exc))
+            return
+        await self._reply_pvp(replies, when)
 
     async def _append_xiucai(self, replies: ReplySession):
         if not self.xiucai_trigger:
@@ -73,10 +86,12 @@ class HelloBot(botpy.Client):
             # 附图失败只记日志，不追加错误回复，避免重复触发。
             logger.warning("秀才图片发送失败：%s", exc)
 
-    async def _reply_pvp(self, replies: ReplySession):
+    async def _reply_pvp(self, replies: ReplySession, when=None):
         try:
-            battle = get_today_battlefield()
-            text = (f"今日战场：{battle['name']}\n\n"
+            battle = get_today_battlefield() if when is None else get_today_battlefield(when)
+            heading = "今日战场：" if when is None else (
+                f"查询时间：{when.date().isoformat()} {when.hour:02d}:00（北京时间）\n\n此时战场：")
+            text = (f"{heading}{battle['name']}\n\n"
                     f"{battle['time_until_rotation']}后轮换至{battle['next_name']}")
         except (OSError, ValueError, KeyError, TypeError) as exc:
             logger.error("读取战场信息失败：%s", exc)

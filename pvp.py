@@ -29,6 +29,17 @@ def is_pvp_command(content: str | None) -> bool:
     return parse_command(content) == "/pvp"
 
 
+def parse_predict_time(value: str) -> datetime:
+    """将查询时间按北京时间的整点解析；小时支持一位或两位数字。"""
+    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{1,2}", value):
+        raise ValueError("格式：/predict yyyy-mm-dd-hh，例如 /predict 2026-10-28-23；时间为北京时间。")
+    try:
+        year, month, day, hour = map(int, value.split("-"))
+        return datetime(year, month, day, hour, tzinfo=BEIJING)
+    except ValueError:
+        raise ValueError("日期或小时无效，请输入有效日期，小时为 0–23，例如 /predict 2026-10-28-23。") from None
+
+
 def get_today_battlefield(now: datetime | None = None) -> dict[str, str]:
     """读取配置并计算当前战场；now 必须带时区，避免依赖主机时区。"""
     now = now if now is not None else datetime.now(BEIJING)
@@ -47,7 +58,8 @@ def get_today_battlefield(now: datetime | None = None) -> dict[str, str]:
     if not order or type(index) is not int or not 0 <= index < len(order):
         raise ValueError("轮换顺序或基准索引无效。")
     # timedelta.days 向下取整，因此基准之前的日期也能正确逆推。
-    days = (now.astimezone(BEIJING) - anchor).days
+    elapsed = now.astimezone(BEIJING) - anchor
+    days = elapsed.days
     position = (index + days) % len(order)
     battle = info[order[position]]
     next_name = info[order[(position + 1) % len(order)]]["name"]
@@ -55,9 +67,9 @@ def get_today_battlefield(now: datetime | None = None) -> dict[str, str]:
         raise ValueError("战场信息必须包含非空的 name 和 image。")
     if not isinstance(next_name, str) or not next_name.strip():
         raise ValueError("下一战场必须包含非空的 name。")
-    next_rotation = anchor + timedelta(days=days + 1)
     # 向上取整，切换前不足一秒时显示 1 秒；23:00 整点已进入新轮次。
-    seconds = math.ceil((next_rotation - now.astimezone(BEIJING)).total_seconds())
+    # 用时长计算，避免查询 9999-12-31 时构造下一天而溢出。
+    seconds = math.ceil((timedelta(days=days + 1) - elapsed).total_seconds())
     hours, seconds = divmod(seconds, 3600)
     minutes, seconds = divmod(seconds, 60)
     countdown = f"{hours}小时" if hours else ""

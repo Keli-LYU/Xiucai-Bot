@@ -5,7 +5,8 @@
 运行目录为 `/opt/qq-bot/current`，systemd 服务名为 `qq-bot`，运行用户为 `qqbot`。
 
 当前版本：`20261023T140953Z`，运行环境为 Python 3.10 虚拟环境。
-当前命令为 `/pvp` 和 `/xiucai`；本地验证包含 40 项测试。
+当前命令为 `/pvp`、`/predict yyyy-mm-dd-hh` 和 `/xiucai`；本地验证包含 46 项测试。
+`/predict` 按北京时间查询指定日期整点的战场，支持过去和未来日期，使用每日 23:00 切换的同一轮换规则。
 2026-10-23 22:27（北京时间）已确认 QQ 鉴权成功、机器人“秀才”上线并启动心跳，服务为 `enabled / active (running)`。
 15 张秀才 GIF/WebP 均已通过 SHA-256 校验并保留原格式。
 
