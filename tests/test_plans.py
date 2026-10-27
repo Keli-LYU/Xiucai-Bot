@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import botpy
 from botpy.message import C2CMessage, GroupMessage
+from PIL import Image
 
 from bot import HelloBot
 from plans import PlanManager, display_plan_time, parse_plan_time
@@ -230,12 +231,14 @@ class CommandTests(unittest.IsolatedAsyncioTestCase):
     async def test_successful_alarm_appends_one_xiucai_when_enabled(self):
         _, plan = await self.client.plan_manager.set("group", "user", "小明", parse_plan_time("2400", self.now))
         self.client.xiucai_trigger = True
-        with patch("bot.choose_xiucai_image", return_value=Path("picture.gif")) as choose:
+        picture = Path(self.directory.name) / "picture.gif"
+        Image.new("RGB", (120, 160), "red").save(picture)
+        with patch("bot.choose_xiucai_image", return_value=picture) as choose:
             await self.client._send_plan_notification(plan)
         self.assertEqual(self.http.request.await_count, 2)
         choose.assert_called_once()
         second = self.http.request.await_args.kwargs["json"]["markdown"]["content"]
-        self.assertEqual(second, "![图片](qqbot-media://image/v1/xiucai)")
+        self.assertEqual(second, "![图片 #120px #160px](qqbot-media://image/v1/xiucai)")
 
     async def test_failed_alarm_does_not_append_image(self):
         _, plan = await self.client.plan_manager.set("group", "user", "小明", parse_plan_time("2400", self.now))

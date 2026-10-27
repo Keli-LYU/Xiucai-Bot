@@ -9,12 +9,20 @@ from pathlib import Path
 
 import aiohttp
 from botpy.http import Route
+from PIL import Image
 
 from local_images import IMAGE_MIME_TYPES, read_image
 
 
 CACHE_PATH = Path(__file__).resolve().parent / ".cache" / "markdown-images.json"
 logger = logging.getLogger("hello_bot")
+
+
+def format_markdown_image(path: Path, url: str, alt_text: str = "图片") -> str:
+    """读取原图尺寸并写入 QQ Markdown，不改写图片或动图帧。"""
+    with Image.open(path) as image:
+        width, height = image.size
+    return f"![{alt_text} #{width}px #{height}px]({url})"
 
 
 async def put_image(url: str, data: bytes, content_type: str) -> str:

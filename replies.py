@@ -5,7 +5,7 @@ from pathlib import Path
 from botpy.message import GroupMessage, Message
 
 from local_images import post_channel_image
-from markdown_images import MarkdownImageStore
+from markdown_images import MarkdownImageStore, format_markdown_image
 
 
 class ReplySession:
@@ -50,7 +50,7 @@ class ReplySession:
             )
         else:
             url = await self.image_store.get_url(path)
-            markdown_content = f"![{alt_text}]({url})"
+            markdown_content = format_markdown_image(path, url, alt_text)
             if content.strip():
                 markdown_content += f"\n\n{content}"
             result = await self.message.reply(

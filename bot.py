@@ -11,7 +11,7 @@ from botpy.message import C2CMessage, GroupMessage, Message
 from dotenv import load_dotenv
 from botpy.http import Route
 
-from markdown_images import MarkdownImageStore
+from markdown_images import MarkdownImageStore, format_markdown_image
 from pvp import get_today_battlefield, parse_command, resolve_image_path
 from plans import Plan, PlanManager, display_plan_time, parse_plan_time
 from replies import ReplySession
@@ -132,8 +132,9 @@ class HelloBot(botpy.Client):
             try:
                 if self.markdown_images is None:
                     self.markdown_images = MarkdownImageStore(self.http)
-                url = await self.markdown_images.get_url(choose_xiucai_image())
-                await self._send_active_group_markdown(plan.group_openid, f"![图片]({url})")
+                path = choose_xiucai_image()
+                url = await self.markdown_images.get_url(path)
+                await self._send_active_group_markdown(plan.group_openid, format_markdown_image(path, url))
             except Exception:
                 logger.exception("闹钟附带的秀才图片发送失败。")
 

@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, patch
 
 import botpy
 from botpy.message import C2CMessage, GroupMessage, Message
+from PIL import Image
 
 from bot import HelloBot
 from local_images import read_image
@@ -98,8 +99,8 @@ class ReplyTests(unittest.IsolatedAsyncioTestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
         self.image_path = Path(self.temp_dir.name) / "test.png"
-        self.image_data = b"\x89PNG\r\n\x1a\nlocal-image-test"
-        self.image_path.write_bytes(self.image_data)
+        Image.new("RGB", (800, 250), "blue").save(self.image_path)
+        self.image_data = self.image_path.read_bytes()
         self.battle = {"name": "昂萨哈凯尔（竞争战）", "image": str(self.image_path),
                        "next_name": "沃刻其特（演习战）", "time_until_rotation": "2小时15分钟30秒"}
         self.reply_text = "今日战场：昂萨哈凯尔（竞争战）\n\n2小时15分钟30秒后轮换至沃刻其特（演习战）"
@@ -115,7 +116,7 @@ class ReplyTests(unittest.IsolatedAsyncioTestCase):
         self.client.markdown_images.get_url.assert_awaited_once_with(self.image_path)
         self.api.post_group_message.assert_awaited_once_with(
             group_openid="group", msg_id="msg", msg_type=2, msg_seq=1,
-            markdown={"content": f"![战场图片](qqbot-media://image/v1/battle)\n\n{self.reply_text}",
+            markdown={"content": f"![战场图片 #800px #250px](qqbot-media://image/v1/battle)\n\n{self.reply_text}",
                       "force_verify_image_resource": True},
         )
         self.http.request.assert_not_awaited()
@@ -129,6 +130,7 @@ class ReplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("今日战场：昂萨哈凯尔（竞争战）", reply["markdown"]["content"])
         self.assertIn("2小时15分钟30秒后轮换至沃刻其特（演习战）", reply["markdown"]["content"])
         self.assertIn("qqbot-media://image/v1/battle", reply["markdown"]["content"])
+        self.assertIn("![战场图片 #800px #250px]", reply["markdown"]["content"])
 
     async def test_channel_combines_image_and_text(self):
         await self.client.on_at_message_create(self.channel)

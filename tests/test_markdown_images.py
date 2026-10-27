@@ -8,7 +8,27 @@ from unittest.mock import AsyncMock, patch
 
 from PIL import Image
 
-from markdown_images import MarkdownImageStore
+from markdown_images import MarkdownImageStore, format_markdown_image
+
+
+class MarkdownImageFormatTests(unittest.TestCase):
+    def test_dimensions_keep_original_files_and_animation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for extension in ("png", "jpg", "gif", "webp"):
+                with self.subTest(extension=extension):
+                    path = Path(directory) / f"picture.{extension}"
+                    options = {}
+                    if extension in {"gif", "webp"}:
+                        options = {"save_all": True, "append_images": [Image.new("RGB", (123, 45), "blue")],
+                                   "duration": 100, "loop": 0}
+                    Image.new("RGB", (123, 45), "red").save(path, **options)
+                    before = path.read_bytes()
+                    self.assertEqual(format_markdown_image(path, "qqbot-media://image/v1/token", "测试"),
+                                     "![测试 #123px #45px](qqbot-media://image/v1/token)")
+                    self.assertEqual(path.read_bytes(), before)
+                    if extension in {"gif", "webp"}:
+                        with Image.open(path) as image:
+                            self.assertEqual(image.n_frames, 2)
 
 
 class MarkdownImageTests(unittest.IsolatedAsyncioTestCase):

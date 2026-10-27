@@ -102,7 +102,7 @@ class TriggerTests(unittest.IsolatedAsyncioTestCase):
         self.choice.assert_called_once()
         self.client.markdown_images.get_url.assert_awaited_once_with(self.picture)
         self.assertTrue(calls[0].kwargs["markdown"]["content"].startswith("用法：/plan"))
-        self.assertEqual(calls[1].kwargs["markdown"]["content"], "![图片](qqbot-media://image/v1/battle)")
+        self.assertEqual(calls[1].kwargs["markdown"]["content"], "![图片 #2px #2px](qqbot-media://image/v1/battle)")
         self.assertTrue(all("content" not in call.kwargs and "media" not in call.kwargs for call in calls))
         self.http.request.assert_not_awaited()
 
@@ -118,7 +118,7 @@ class TriggerTests(unittest.IsolatedAsyncioTestCase):
         self.client.markdown_images.get_url.assert_awaited_once_with(path)
         reply = self.api.post_group_message.await_args.kwargs
         self.assertEqual(reply["msg_type"], 2)
-        self.assertEqual(reply["markdown"]["content"], "![图片](qqbot-media://image/v1/battle)")
+        self.assertEqual(reply["markdown"]["content"], "![图片 #3px #3px](qqbot-media://image/v1/battle)")
         self.assertNotIn("media", reply)
 
     async def test_webp_channel_multipart_keeps_original_data_and_type(self):
