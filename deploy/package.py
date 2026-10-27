@@ -20,8 +20,7 @@ def package(destination, include_xiucai=True):
             continue
         files.extend((path, path.relative_to(ROOT).as_posix()) for path in (ROOT / name).rglob("*")
                      if path.is_file() and not path.is_symlink() and "__pycache__" not in path.parts)
-    for source, archive_name in ((ROOT / ".cache" / "markdown-images.json", "seed/markdown-images.json"),
-                                 (ROOT / ".data" / "plans.json", "seed/plans.json")):
+    for source, archive_name in ((ROOT / ".cache" / "markdown-images.json", "seed/markdown-images.json"),):
         if source.is_file():
             files.append((source, archive_name))
     manifest = {name: hashlib.sha256(path.read_bytes()).hexdigest() for path, name in files}

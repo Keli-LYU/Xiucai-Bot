@@ -7,26 +7,6 @@
 - 群聊/频道中 `@机器人` 使用命令，单聊直接发送命令；未知命令不回复。
 - `/pvp`：返回对应战场图片、`今日战场：名称` 及下一轮换倒计时。
 - `/xiucai`：切换 `xiucai_trigger`，回复 `xiucai_trigger：已开启` 或 `xiucai_trigger：已关闭`。群聊/频道中需 `@机器人`，单聊直接发指令。
-- `/plan HHMM`：在QQ群设置一次性闹钟；`/plan cancel` 取消本群当前闹钟。
-
-## 群闹钟
-
-在 QQ 群中发送 `@机器人 /plan 2400`，设置 **北京时间今晚 24:00（次日 00:00）** 的闹钟。
-时间使用四位 `HHMM`，例如 `2330`；`2400` 和 `0000` 均表示下一次午夜。其他时间若今天已过或恰好等于当前时刻，则设置为次日的该时刻。`2401`、`2360` 等无效时间会被拒绝。
-
-每个群独立保留一个闹钟：
-
-- 没有闹钟时，创建闹钟。
-- 新时间严格晚于旧时间，覆盖旧闹钟，原任务取消，设置者更新。
-- 新时间更早或相同，保留旧闹钟，并回复 `用户名 已设置时间 的闹钟`。
-- `/plan cancel` 取消本群闹钟；任何群成员都可设置、覆盖和取消。
-
-设置者昵称读取 QQ 消息事件；如平台未提供昵称，会使用 `用户（OpenID末六位）` 标识。
-记录保存在 `.data/plans.json`，程序重启后恢复尚未到期的闹钟。停机期间已过期的闹钟不会补发，日志会说明；发送失败也不自动重试，以免重复通知全体。
-请保持机器人进程在线，定时消息还需平台允许主动发送。
-
-**QQ群 @全体为实测模式**：按你的选择，到点将使用主动 Markdown 消息发送 `<qqbot-at-everyone />` 标签。官方文本交互文档目前仅公开支持文字子频道 @全体，QQ群是否真正提醒所有成员需 QQ 实测，不能仅以消息发送成功判断。不会把普通文字“@全体成员”当作真正提及的替代。
-消息发送成功后，如秀才开关开启，仍会追加一张秀才图片。`/plan` 仅支持QQ群，私聊和频道不会创建闹钟。
 
 ## 随机秀才图片
 
@@ -57,7 +37,7 @@
 
 群聊/单聊使用自定义 Markdown，将图片和 `今日战场：名称` 放在同一条消息中；频道使用 multipart 图文消息。图片上传或图文发送失败时回退为文字，并记录错误日志。
 本地战场图片通过 QQ 素材管理上传，获得 `qqbot-media://` 引用，无需公网图片链接；引用按机器人、环境和图片内容缓存在 `.cache/markdown-images.json`，重启后可复用，避免每次查询重复上传。
-所有 Markdown 图片引用会读取原图实际宽高，使用 `![说明 #宽px #高px](引用)` 格式，包括战场图、秀才图和闹钟附图；读取尺寸不改写图片，GIF/WebP 保留原格式与动画。
+所有 Markdown 图片引用会读取原图实际宽高，使用 `![说明 #宽px #高px](引用)` 格式，包括战场图和秀才图；读取尺寸不改写图片，GIF/WebP 保留原格式与动画。
 图片已配置为 `pvp-info/image/` 中的五张本地 PNG。例如 `"image": "image/昂萨哈凯尔.png"`，相对路径以 `info.json` 所在目录为基准，也支持绝对路径（Windows 反斜杠在 JSON 中须写为 `\\`，或使用 `/`）。
 支持 PNG/JPG，单张不超过 5 MB。群聊/单聊使用本地文件数据上传，频道使用 multipart 文件上传，无需公网图片链接。
 
@@ -98,7 +78,7 @@ python -m venv .venv
 ```
 
 出现「机器人已上线」后，在 QQ 单聊发送 `/pvp`，或在群/频道发送 `@机器人 /pvp`。
-预期收到战场图文。按 `Ctrl+C` 停止，未到期的群闹钟会在下次启动后恢复。
+预期收到战场图文。按 `Ctrl+C` 停止。
 
 若启动失败，请检查 AppID / AppSecret、平台回调方式、网络连接和 IP 白名单。
 若上线后没有事件，请检查测试账号、服务范围、对应场景权限和事件订阅。
@@ -112,5 +92,3 @@ python -m venv .venv
 - [官方本地文件上传参数](https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_files.post.html)
 - [官方 Markdown 图文格式](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/type/markdown.html)
 - [官方 Markdown 本地图片素材管理](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/material-management.html)
-- [官方 @能力与适用范围](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/trans/text-chain.html)
-- [官方主动消息与被动回复规则](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/overview.html)

@@ -3,7 +3,6 @@
 !.env.example
 .venv/
 .cache/
-.data/
 .deploy/
 __pycache__/
 *.py[cod]

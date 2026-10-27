@@ -22,18 +22,14 @@ if [[ "$PHASE" == prepare ]]; then
     fi
     install -d -m 0755 "$ROOT" "$ROOT/releases" "$ROOT/admin"
     install -d -m 0750 -o root -g qqbot "$ROOT/shared"
-    install -d -m 0700 -o qqbot -g qqbot "$ROOT/shared/.cache" "$ROOT/shared/.data"
+    install -d -m 0700 -o qqbot -g qqbot "$ROOT/shared/.cache"
     [[ ! -e "$APP" ]] || { echo 'Release already exists.' >&2; exit 1; }
     mkdir -m 0750 "$APP"
     tar -xzf "$ARCHIVE" -C "$APP" --no-same-owner --no-same-permissions
     ln -s "$ROOT/shared/.env" "$APP/.env"
     ln -s "$ROOT/shared/.cache" "$APP/.cache"
-    ln -s "$ROOT/shared/.data" "$APP/.data"
     if [[ -f "$APP/seed/markdown-images.json" && ! -e "$ROOT/shared/.cache/markdown-images.json" ]]; then
         install -m 0600 -o qqbot -g qqbot "$APP/seed/markdown-images.json" "$ROOT/shared/.cache/markdown-images.json"
-    fi
-    if [[ -f "$APP/seed/plans.json" && ! -e "$ROOT/shared/.data/plans.json" ]]; then
-        install -m 0600 -o qqbot -g qqbot "$APP/seed/plans.json" "$ROOT/shared/.data/plans.json"
     fi
     python3 -m venv "$APP/.venv"
     "$APP/.venv/bin/python" -m pip install --timeout 30 --retries 2 -r "$APP/requirements.txt"
