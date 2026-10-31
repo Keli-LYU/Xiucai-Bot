@@ -1,6 +1,7 @@
 import asyncio
 import tempfile
 import unittest
+from datetime import datetime
 from io import BytesIO
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
@@ -156,6 +157,20 @@ class TriggerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([call.kwargs["msg_seq"] for call in calls], [1, 2])
         self.assertIn("今日战场：test", calls[0].kwargs["markdown"]["content"])
         self.assertIn("1小时0分钟0秒后轮换至next", calls[0].kwargs["markdown"]["content"])
+        self.choice.assert_called_once()
+
+    async def test_predict_name_combines_battle_image_and_text_before_one_followup(self):
+        self.client.xiucai_trigger = True
+        battle = {"name": "test", "image": str(self.picture), "is_current": False,
+                  "next_rotation_time": datetime.fromisoformat("2026-11-01T23:00:00+08:00")}
+        with patch("bot.get_next_battlefield_rotation", return_value=battle):
+            await self.client.on_group_at_message_create(self.group("/predict cfmy"))
+        calls = self.api.post_group_message.await_args_list
+        self.assertEqual([call.kwargs["msg_seq"] for call in calls], [1, 2])
+        primary = calls[0].kwargs["markdown"]["content"]
+        self.assertIn("![战场图片 #2px #2px]", primary)
+        self.assertIn("下次轮换：2026-11-01 23:00（北京时间）", primary)
+        self.assertEqual(calls[1].kwargs["markdown"]["content"], "![图片 #2px #2px](qqbot-media://image/v1/battle)")
         self.choice.assert_called_once()
 
     async def test_c2c_pvp_and_followup_use_two_replies(self):

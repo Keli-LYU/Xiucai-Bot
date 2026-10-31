@@ -81,11 +81,13 @@ class HelloBot(botpy.Client):
                 if battle["is_current"]:
                     text += "\n\n该战场当前正在进行，以上为下一次轮换到该战场的时间。"
             except BattlefieldMatchError as exc:
-                text = str(exc)
+                await replies.text(str(exc))
+                return
             except (OSError, ValueError, KeyError, TypeError) as exc:
                 logger.error("查询战场下次轮换失败：%s", exc)
-                text = "战场信息暂不可用，请稍后再试。"
-            await replies.text(text)
+                await replies.text("战场信息暂不可用，请稍后再试。")
+                return
+            await self._reply_battle_image(replies, battle, text)
             return
         try:
             when = parse_predict_time(query)
@@ -115,6 +117,9 @@ class HelloBot(botpy.Client):
             await replies.text("战场信息暂不可用，请稍后再试。")
             return
 
+        await self._reply_battle_image(replies, battle, text)
+
+    async def _reply_battle_image(self, replies: ReplySession, battle, text: str):
         try:
             await replies.image_with_text(resolve_image_path(battle["image"]), text)
         except Exception as exc:

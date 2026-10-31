@@ -223,18 +223,23 @@ class ReplyTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_predict_alias_in_group_and_partial_name_in_private_chat(self):
         now = datetime(2026, 10, 22, 22, tzinfo=BEIJING)
-        with patch("bot.get_next_battlefield_rotation", side_effect=lambda query: get_next_battlefield_rotation(query, now)):
+        def battle_at(query):
+            return {**get_next_battlefield_rotation(query, now), "image": str(self.image_path)}
+        with patch("bot.get_next_battlefield_rotation", side_effect=battle_at):
             self.group.content = "/predict CF"
             await self.client.on_group_at_message_create(self.group)
             content = self.api.post_group_message.await_args.kwargs["markdown"]["content"]
             self.assertIn("战场：尘封秘岩（争夺战）", content)
             self.assertIn("下次轮换：2026-10-24 23:00（北京时间）", content)
+            self.assertIn("![战场图片 #800px #250px]", content)
+            self.assertTrue(self.api.post_group_message.await_args.kwargs["markdown"]["force_verify_image_resource"])
             self.c2c.content = "/predict 昂萨"
             await self.client.on_c2c_message_create(self.c2c)
             content = self.api.post_c2c_message.await_args.kwargs["markdown"]["content"]
             self.assertIn("战场：昂萨哈凯尔（竞争战）", content)
             self.assertIn("下次轮换：2026-10-22 23:00（北京时间）", content)
-        self.client.markdown_images.get_url.assert_not_awaited()
+            self.assertIn("![战场图片 #800px #250px]", content)
+        self.assertEqual(self.client.markdown_images.get_url.await_count, 2)
 
     async def test_predict_current_battle_explains_next_reappearance(self):
         self.group.content = "/predict 草原"
@@ -261,6 +266,19 @@ class ReplyTests(unittest.IsolatedAsyncioTestCase):
             with self.assertLogs("hello_bot", level="ERROR"):
                 await self.client.on_group_at_message_create(self.group)
         self.assertEqual(self.api.post_group_message.await_args.kwargs["markdown"]["content"], "战场信息暂不可用，请稍后再试。")
+
+    async def test_predict_name_image_failure_preserves_next_rotation_text(self):
+        self.group.content = "/predict cfmy"
+        now = datetime(2026, 10, 22, 22, tzinfo=BEIJING)
+        self.client.markdown_images.get_url.side_effect = RuntimeError("upload failed")
+        with patch("bot.get_next_battlefield_rotation", side_effect=lambda query: get_next_battlefield_rotation(query, now)):
+            with self.assertLogs("hello_bot", level="WARNING"):
+                await self.client.on_group_at_message_create(self.group)
+        self.api.post_group_message.assert_awaited_once()
+        reply = self.api.post_group_message.await_args.kwargs
+        self.assertEqual(reply["msg_seq"], 2)
+        self.assertIn("战场：尘封秘岩（争夺战）", reply["markdown"]["content"])
+        self.assertIn("下次轮换：2026-10-24 23:00（北京时间）", reply["markdown"]["content"])
 
     async def test_invalid_predict_never_loads_battlefield_or_image(self):
         for command in ("/predict", "/predict 2026-10-28-23 extra", "/predict 2026-02-29-9", "/predict 2026-10-28-24"):
