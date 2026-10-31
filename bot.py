@@ -9,7 +9,8 @@ from botpy.message import C2CMessage, GroupMessage, Message
 from dotenv import load_dotenv
 
 from markdown_images import MarkdownImageStore
-from pvp import get_today_battlefield, parse_command, parse_predict_time, resolve_image_path
+from pvp import (BattlefieldMatchError, get_next_battlefield_rotation, get_today_battlefield,
+                 parse_command, parse_predict_time, resolve_image_path)
 from replies import ReplySession
 from xiucai import choose_xiucai_image
 
@@ -68,10 +69,26 @@ class HelloBot(botpy.Client):
 
     async def _reply_predict(self, replies: ReplySession, arguments):
         if len(arguments) != 1:
-            await replies.text("用法：/predict yyyy-mm-dd-hh，例如 /predict 2026-10-28-23；时间为北京时间。")
+            await replies.text("用法：/predict yyyy-mm-dd-hh 查询指定时刻；/predict 战场名称或昵称 查询下次轮换，例如 /predict cf、/predict 草原。时间为北京时间。")
+            return
+        query = arguments[0]
+        if not (query[:1].isdecimal() and "-" in query):
+            try:
+                battle = get_next_battlefield_rotation(query)
+                when = battle["next_rotation_time"]
+                text = (f"战场：{battle['name']}\n\n"
+                        f"下次轮换：{when.date().isoformat()} {when.hour:02d}:{when.minute:02d}（北京时间）")
+                if battle["is_current"]:
+                    text += "\n\n该战场当前正在进行，以上为下一次轮换到该战场的时间。"
+            except BattlefieldMatchError as exc:
+                text = str(exc)
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                logger.error("查询战场下次轮换失败：%s", exc)
+                text = "战场信息暂不可用，请稍后再试。"
+            await replies.text(text)
             return
         try:
-            when = parse_predict_time(arguments[0])
+            when = parse_predict_time(query)
         except ValueError as exc:
             await replies.text(str(exc))
             return

@@ -11,7 +11,8 @@ from PIL import Image
 
 from bot import HelloBot
 from local_images import read_image
-from pvp import BEIJING, DATA_DIR, get_today_battlefield, is_pvp_command, parse_predict_time, resolve_image_path
+from pvp import (BEIJING, DATA_DIR, BattlefieldMatchError, get_next_battlefield_rotation,
+                 get_today_battlefield, is_pvp_command, match_battlefield, parse_predict_time, resolve_image_path)
 
 
 class RotationTests(unittest.TestCase):
@@ -106,6 +107,56 @@ class RotationTests(unittest.TestCase):
             self.assertFalse(is_pvp_command(text), text)
 
 
+class NamePredictionTests(unittest.TestCase):
+    def test_partial_names_nicknames_and_case(self):
+        now = datetime(2026, 10, 22, 22, tzinfo=BEIJING)
+        for query in ("cf", "CF", "cfmy", "秘岩", "尘封", "争夺"):
+            with self.subTest(query=query):
+                battle = get_next_battlefield_rotation(query, now)
+                self.assertEqual(battle["name"], "尘封秘岩（争夺战）")
+                self.assertEqual(battle["next_rotation_time"], datetime(2026, 10, 24, 23, tzinfo=BEIJING))
+        for query in ("草原", "昂萨", "昂萨哈凯尔(竞争战)"):
+            with self.subTest(query=query):
+                self.assertEqual(get_next_battlefield_rotation(query, now)["name"], "昂萨哈凯尔（竞争战）")
+
+    def test_next_occurrence_before_at_and_after_switch(self):
+        cases = [
+            ("2026-10-22T22:59:59.999999+08:00", "草原", "2026-10-22T23:00:00+08:00", False),
+            ("2026-10-22T23:00:00+08:00", "草原", "2026-10-26T23:00:00+08:00", True),
+            ("2026-10-23T00:00:00+08:00", "草原", "2026-10-26T23:00:00+08:00", True),
+            ("2026-10-24T23:00:00+08:00", "cf", "2026-10-28T23:00:00+08:00", True),
+            ("2026-10-29T23:00:00+08:00", "阵地", "2026-11-06T23:00:00+08:00", True),
+            ("2026-10-18T10:00:00+08:00", "草原", "2026-10-18T23:00:00+08:00", False),
+        ]
+        for now, query, expected, current in cases:
+            with self.subTest(now=now, query=query):
+                battle = get_next_battlefield_rotation(query, datetime.fromisoformat(now))
+                self.assertEqual(battle["next_rotation_time"], datetime.fromisoformat(expected))
+                self.assertEqual(battle["is_current"], current)
+                self.assertEqual(get_today_battlefield(battle["next_rotation_time"])["name"], battle["name"])
+
+    def test_same_instant_uses_beijing_and_rejects_naive_time(self):
+        now = datetime(2026, 10, 23, 1, tzinfo=BEIJING)
+        self.assertEqual(get_next_battlefield_rotation("草原", now),
+                         get_next_battlefield_rotation("草原", now.astimezone(timezone.utc)))
+        with self.assertRaises(ValueError):
+            get_next_battlefield_rotation("草原", now.replace(tzinfo=None))
+
+    def test_exact_alias_precedes_partial_alias_and_supports_lists(self):
+        info = {"one": {"name": "战场甲", "nickname": ["cf", "甲图"]},
+                "two": {"name": "战场乙", "nickname": "cfmy"}}
+        self.assertEqual(match_battlefield("CF", info), "one")
+        self.assertEqual(match_battlefield("甲图", info), "one")
+        with self.assertRaisesRegex(BattlefieldMatchError, "多个战场"):
+            match_battlefield("c", info)
+
+    def test_missing_or_ambiguous_query_does_not_choose_a_battlefield(self):
+        now = datetime(2026, 10, 23, tzinfo=BEIJING)
+        for query in ("", "不存在的战场", "战"):
+            with self.subTest(query=query), self.assertRaises(BattlefieldMatchError):
+                get_next_battlefield_rotation(query, now)
+
+
 class ReplyTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.api = AsyncMock()
@@ -169,6 +220,47 @@ class ReplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("查询时间：2028-02-29 09:00（北京时间）", reply["markdown"]["content"])
         self.assertIn(f"此时战场：{self.battle['name']}", reply["markdown"]["content"])
         self.assertEqual(reply["msg_seq"], 2)
+
+    async def test_predict_alias_in_group_and_partial_name_in_private_chat(self):
+        now = datetime(2026, 10, 22, 22, tzinfo=BEIJING)
+        with patch("bot.get_next_battlefield_rotation", side_effect=lambda query: get_next_battlefield_rotation(query, now)):
+            self.group.content = "/predict CF"
+            await self.client.on_group_at_message_create(self.group)
+            content = self.api.post_group_message.await_args.kwargs["markdown"]["content"]
+            self.assertIn("战场：尘封秘岩（争夺战）", content)
+            self.assertIn("下次轮换：2026-10-24 23:00（北京时间）", content)
+            self.c2c.content = "/predict 昂萨"
+            await self.client.on_c2c_message_create(self.c2c)
+            content = self.api.post_c2c_message.await_args.kwargs["markdown"]["content"]
+            self.assertIn("战场：昂萨哈凯尔（竞争战）", content)
+            self.assertIn("下次轮换：2026-10-22 23:00（北京时间）", content)
+        self.client.markdown_images.get_url.assert_not_awaited()
+
+    async def test_predict_current_battle_explains_next_reappearance(self):
+        self.group.content = "/predict 草原"
+        now = datetime(2026, 10, 22, 23, tzinfo=BEIJING)
+        with patch("bot.get_next_battlefield_rotation", side_effect=lambda query: get_next_battlefield_rotation(query, now)):
+            await self.client.on_group_at_message_create(self.group)
+        content = self.api.post_group_message.await_args.kwargs["markdown"]["content"]
+        self.assertIn("2026-10-26 23:00", content)
+        self.assertIn("当前正在进行", content)
+
+    async def test_predict_unknown_or_ambiguous_name_explains_without_images(self):
+        for query, expected in (("不存在", "未找到"), ("战", "多个战场")):
+            with self.subTest(query=query):
+                self.api.post_group_message.reset_mock()
+                self.group.content = f"/predict {query}"
+                await self.client.on_group_at_message_create(self.group)
+                self.api.post_group_message.assert_awaited_once()
+                self.assertIn(expected, self.api.post_group_message.await_args.kwargs["markdown"]["content"])
+        self.client.markdown_images.get_url.assert_not_awaited()
+
+    async def test_predict_name_config_failure_gets_explicit_error(self):
+        self.group.content = "/predict cf"
+        with patch("bot.get_next_battlefield_rotation", side_effect=OSError("missing config")):
+            with self.assertLogs("hello_bot", level="ERROR"):
+                await self.client.on_group_at_message_create(self.group)
+        self.assertEqual(self.api.post_group_message.await_args.kwargs["markdown"]["content"], "战场信息暂不可用，请稍后再试。")
 
     async def test_invalid_predict_never_loads_battlefield_or_image(self):
         for command in ("/predict", "/predict 2026-10-28-23 extra", "/predict 2026-02-29-9", "/predict 2026-10-28-24"):

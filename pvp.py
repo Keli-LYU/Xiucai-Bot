@@ -3,12 +3,17 @@
 import json
 import math
 import re
+import unicodedata
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 
 BEIJING = timezone(timedelta(hours=8))
 DATA_DIR = Path(__file__).resolve().parent / "pvp-info"
+
+
+class BattlefieldMatchError(ValueError):
+    """用户输入未能唯一匹配战场。"""
 
 
 def resolve_image_path(image: str) -> Path:
@@ -40,11 +45,7 @@ def parse_predict_time(value: str) -> datetime:
         raise ValueError("日期或小时无效，请输入有效日期，小时为 0–23，例如 /predict 2026-10-28-23。") from None
 
 
-def get_today_battlefield(now: datetime | None = None) -> dict[str, str]:
-    """读取配置并计算当前战场；now 必须带时区，避免依赖主机时区。"""
-    now = now if now is not None else datetime.now(BEIJING)
-    if now.tzinfo is None or now.utcoffset() is None:
-        raise ValueError("战场查询时间必须包含时区。")
+def _load_rotation():
     with (DATA_DIR / "info.json").open(encoding="utf-8-sig") as file:
         info = json.load(file)
     with (DATA_DIR / "rotation.json").open(encoding="utf-8-sig") as file:
@@ -55,8 +56,69 @@ def get_today_battlefield(now: datetime | None = None) -> dict[str, str]:
         raise ValueError("轮换基准时间必须为北京时间 23:00。")
     order = rotation["order"]
     index = rotation["anchor_index"]
-    if not order or type(index) is not int or not 0 <= index < len(order):
+    if (not isinstance(order, list) or not order or type(index) is not int or not 0 <= index < len(order)
+            or not isinstance(info, dict) or any(not isinstance(key, str) or key not in info for key in order)):
         raise ValueError("轮换顺序或基准索引无效。")
+    return info, anchor, order, index
+
+
+def match_battlefield(query: str, info: dict) -> str:
+    """先精确匹配，再按 name/nickname 子串联想；昵称支持字符串或字符串列表。"""
+    def normalize(value):
+        return unicodedata.normalize("NFKC", value).strip().casefold()
+
+    query = normalize(query)
+    if not query:
+        raise BattlefieldMatchError("请输入战场名称或昵称，例如 /predict cf、/predict 草原。")
+    exact, partial = [], []
+    for key, battle in info.items():
+        name = battle.get("name")
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("战场 name 配置无效。")
+        nicknames = battle.get("nickname", [])
+        if isinstance(nicknames, str):
+            nicknames = [nicknames]
+        if not isinstance(nicknames, list) or any(not isinstance(n, str) for n in nicknames):
+            raise ValueError("战场 nickname 必须为字符串或字符串列表。")
+        terms = [normalize(value) for value in [name, *nicknames] if value.strip()]
+        if query in terms:
+            exact.append(key)
+        elif any(query in term for term in terms):
+            partial.append(key)
+    matches = exact or partial
+    if not matches:
+        raise BattlefieldMatchError("未找到匹配战场，请输入部分名称或昵称，例如 /predict cf、/predict 草原。")
+    if len(matches) > 1:
+        names = "\n".join(info[key]["name"] for key in matches)
+        raise BattlefieldMatchError(f"匹配到多个战场，请输入更完整的名称或昵称：\n{names}")
+    return matches[0]
+
+
+def get_next_battlefield_rotation(query: str, now: datetime | None = None) -> dict:
+    """查询严格晚于当前时刻的下一次轮换入场时间，即使该战场正在进行。"""
+    now = now if now is not None else datetime.now(BEIJING)
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("战场查询时间必须包含时区。")
+    info, anchor, order, index = _load_rotation()
+    key = match_battlefield(query, info)
+    days = (now.astimezone(BEIJING) - anchor).days
+    position = (index + days) % len(order)
+    for offset in range(1, len(order) + 1):
+        if order[(position + offset) % len(order)] == key:
+            try:
+                when = anchor + timedelta(days=days + offset)
+            except OverflowError:
+                raise ValueError("下一次轮换时间超出支持的日期范围。") from None
+            return {**info[key], "next_rotation_time": when, "is_current": order[position] == key}
+    raise ValueError("该战场未配置到轮换顺序中。")
+
+
+def get_today_battlefield(now: datetime | None = None) -> dict[str, str]:
+    """读取配置并计算当前战场；now 必须带时区，避免依赖主机时区。"""
+    now = now if now is not None else datetime.now(BEIJING)
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("战场查询时间必须包含时区。")
+    info, anchor, order, index = _load_rotation()
     # timedelta.days 向下取整，因此基准之前的日期也能正确逆推。
     elapsed = now.astimezone(BEIJING) - anchor
     days = elapsed.days

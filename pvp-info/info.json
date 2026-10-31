@@ -5,7 +5,8 @@
     },
     "Seal Rock":{
         "name":"尘封秘岩（争夺战）",
-        "image":"image/尘封秘岩.png"
+        "image":"image/尘封秘岩.png",
+        "nickname":"cfmy"
     },
     "The Fields of Glory":{
         "name":"荣誉野（碎冰战）",
@@ -13,11 +14,13 @@
     },
     "Onsal Hakair":{
         "name":"昂萨哈凯尔（竞争战）",
-        "image":"image/昂萨哈凯尔.png"
+        "image":"image/昂萨哈凯尔.png",
+        "nickname":"草原"
     },
     "Worqor Chirteh":{
         "name":"沃刻其特（演习战）",
-        "image":"image/沃刻其特.png"
+        "image":"image/沃刻其特.png",
+        "nickname":"wkqt"
     }
 
 }
