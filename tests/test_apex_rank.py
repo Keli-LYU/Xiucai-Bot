@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock, patch
 
@@ -64,10 +65,12 @@ class RankCommandTests(unittest.IsolatedAsyncioTestCase):
             await client.on_group_at_message_create(message)
             return api.post_group_message.await_args.kwargs["markdown"]["content"]
 
-        result = {"name": "风暴点", "next_name": "电气区", "time_until_rotation": "1小时0分钟0秒"}
+        result = {"name": "风暴点", "next_name": "电气区", "time_until_rotation": "1小时0分钟0秒",
+                  "image": get_rank_rotation(parse_rank_time("26-11-08-20"))["image"]}
         with patch("bot.get_rank_rotation", return_value=result) as query:
             self.assertIn("当前排位地图：风暴点", await send("<@!123> /rank"))
             query.assert_called_once_with(None)
+            self.assertIn("![战场图片 #", api.post_group_message.await_args.kwargs["markdown"]["content"])
         self.assertIn("此时排位地图：残月", await send("/rank 2026-11-09-03:30"))
         self.assertIn("查询时间：2026-11-09 03:30（北京时间）", await send("/rank 26-11-09-03:30"))
         self.assertIn("日期或时间无效", await send("/rank 2026-11-08-24"))

@@ -53,3 +53,5 @@ systemctl start qq-bot
 服务器准备阶段执行 `deploy/install.sh prepare <版本号>`，创建虚拟环境并以 qqbot 用户运行测试；通过后执行 `deploy/install.sh activate <版本号>` 激活。
 脚本使用 `/opt/qq-bot/incoming/qq-bot-<版本号>.tar.gz` 和同目录下的 `qq-bot-<版本号>.env`。
 仅准备新的发布目录，不删除历史版本。正式激活后应检查日志中已出现机器人上线与 WebSocket 心跳。
+
+Apex `/rank` 和 `/mixtape` 使用 `apex-info/image/` 本地图片；混战九项顺序及北京时间基准见 `apex-info/mixtape.json`。超大静态图片发送副本缓存在共享 `.cache/apex-images/`，服务用户须可写，原图不改写。

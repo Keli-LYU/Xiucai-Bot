@@ -74,7 +74,8 @@ class TriggerTests(unittest.IsolatedAsyncioTestCase):
         self.battle_patch.start()
         self.addCleanup(self.battle_patch.stop)
         self.rank_patch = patch("bot.get_rank_rotation", return_value={
-            "name": "风暴点", "next_name": "电气区", "time_until_rotation": "1小时0分钟0秒"})
+            "name": "风暴点", "next_name": "电气区", "time_until_rotation": "1小时0分钟0秒",
+            "image": str(self.picture)})
         self.rank_patch.start()
         self.addCleanup(self.rank_patch.stop)
 
@@ -142,7 +143,7 @@ class TriggerTests(unittest.IsolatedAsyncioTestCase):
         )
         self.choice.return_value = path
         message = Message(self.api, "event", {
-            "id": "channel-msg", "content": "/rank", "channel_id": "channel",
+            "id": "channel-msg", "content": "/rank invalid", "channel_id": "channel",
         })
         await self.client.on_at_message_create(message)
         writer = AsyncMock()
@@ -194,7 +195,7 @@ class TriggerTests(unittest.IsolatedAsyncioTestCase):
     async def test_channel_reply_and_image_do_not_loop(self):
         self.client.xiucai_trigger = True
         message = Message(self.api, "event", {
-            "id": "channel-msg", "content": "/rank", "channel_id": "channel",
+            "id": "channel-msg", "content": "/rank invalid", "channel_id": "channel",
         })
         await self.client.on_at_message_create(message)
         self.api.post_message.assert_awaited_once()

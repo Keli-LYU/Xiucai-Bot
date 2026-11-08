@@ -9,6 +9,8 @@ from botpy.message import C2CMessage, GroupMessage, Message
 from dotenv import load_dotenv
 
 from apex_rank import USAGE as RANK_USAGE, get_rank_rotation, parse_rank_time
+from apex_mixtape import USAGE as MIXTAPE_USAGE, get_mixtape_rotation, parse_mixtape_time
+from apex_images import prepare_apex_image
 from markdown_images import MarkdownImageStore
 from pvp import (BattlefieldMatchError, get_next_battlefield_rotation, get_today_battlefield,
                  parse_command, parse_predict_time, resolve_image_path)
@@ -64,31 +66,47 @@ class HelloBot(botpy.Client):
             await self._reply_pvp(replies)
         elif command.split()[:1] == ["/rank"]:
             await self._reply_rank(replies, command.split()[1:])
+        elif command.split()[:1] == ["/mixtape"]:
+            await self._reply_mixtape(replies, command.split()[1:])
         elif command.split()[:1] == ["/predict"]:
             await self._reply_predict(replies, command.split()[1:])
 
     async def _reply_rank(self, replies: ReplySession, arguments):
+        await self._reply_apex_rotation(replies, arguments, label="排位地图", usage=RANK_USAGE,
+                                        parse_time=parse_rank_time, lookup=get_rank_rotation)
+
+    async def _reply_mixtape(self, replies: ReplySession, arguments):
+        await self._reply_apex_rotation(replies, arguments, label="混战地图", usage=MIXTAPE_USAGE,
+                                        parse_time=parse_mixtape_time, lookup=get_mixtape_rotation)
+
+    async def _reply_apex_rotation(self, replies, arguments, *, label, usage, parse_time, lookup):
         if len(arguments) > 1:
-            await replies.text(RANK_USAGE)
+            await replies.text(usage)
             return
         when = None
         if arguments:
             try:
-                when = parse_rank_time(arguments[0])
+                when = parse_time(arguments[0])
             except ValueError as exc:
                 await replies.text(str(exc))
                 return
         try:
-            rotation = get_rank_rotation(when)
+            rotation = lookup(when)
         except (OSError, ValueError, KeyError, TypeError, OverflowError) as exc:
-            logger.error("读取排位地图信息失败：%s", exc)
-            await replies.text("排位地图信息暂不可用，请稍后再试。")
+            logger.error("读取%s信息失败：%s", label, exc)
+            await replies.text(f"{label}信息暂不可用，请稍后再试。")
             return
-        heading = "当前排位地图：" if when is None else (
-            f"查询时间：{when:%Y-%m-%d %H:%M}（北京时间）\n\n此时排位地图：")
-        await replies.text(
-            f"{heading}{rotation['name']}\n\n"
-            f"{rotation['time_until_rotation']}后轮换至{rotation['next_name']}")
+        heading = f"当前{label}：" if when is None else (
+            f"查询时间：{when:%Y-%m-%d %H:%M}（北京时间）\n\n此时{label}：")
+        text = (f"{heading}{rotation['name']}\n\n"
+                f"{rotation['time_until_rotation']}后轮换至{rotation['next_name']}")
+        try:
+            image = prepare_apex_image(Path(rotation["image"]))
+        except (OSError, ValueError, KeyError) as exc:
+            logger.warning("%s图片准备失败：%s", label, exc)
+            await replies.text(text)
+            return
+        await self._reply_battle_image(replies, {"image": str(image)}, text)
 
     async def _reply_predict(self, replies: ReplySession, arguments):
         if len(arguments) != 1:

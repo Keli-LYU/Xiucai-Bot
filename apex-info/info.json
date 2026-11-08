@@ -1,14 +1,24 @@
 {
     "Storm Point": {
         "zh-CN": "风暴点",
-        "zh-TW": "暴風點"
+        "zh-TW": "暴風點",
+        "image": "image/Battle Royale/Storm Point.jpg"
     },
     "E-District": {
         "zh-CN": "电气区",
-        "zh-TW": "電流區"
+        "zh-TW": "電流區",
+        "image": "image/Battle Royale/E-District.png"
     },
     "Broken Moon": {
         "zh-CN": "残月",
-        "zh-TW": "殘月"
-    }
+        "zh-TW": "殘月",
+        "image": "image/Battle Royale/Broken Moon.jpg"
+    },
+    "Fragment East": {"zh-CN": "碎片镇"},
+    "Barometer": {"zh-CN": "晴雨表"},
+    "Wattson's Pylon": {"zh-CN": "沃特森的电塔"},
+    "Skull Town": {"zh-CN": "骷髅镇"},
+    "Thunderdome": {"zh-CN": "雷霆堡"},
+    "Monument": {"zh-CN": "纪念碑"},
+    "Production Yard": {"zh-CN": "制造厂"}
 }

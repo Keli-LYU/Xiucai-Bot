@@ -1,0 +1,16 @@
+{
+    "anchor_time": "2026-11-08T20:30:00+08:00",
+    "anchor_index": 5,
+    "interval_minutes": 15,
+    "order": [
+        {"map": "Fragment East", "mode": "Team Deathmatch", "image": "image/Team Deathmatch/Fragment East.jpg"},
+        {"map": "Barometer", "mode": "Control", "image": "image/Control/Barometer.png"},
+        {"map": "Wattson's Pylon", "mode": "Gun Run", "image": "image/Gun Run/Wattson's Pylon.jpg"},
+        {"map": "Skull Town", "mode": "Team Deathmatch", "image": "image/Team Deathmatch/Skull Town.jpg"},
+        {"map": "Thunderdome", "mode": "Control", "image": "image/Control/Thunderdome.jpg"},
+        {"map": "Monument", "mode": "Gun Run", "image": "image/Gun Run/Monument.jpg"},
+        {"map": "Thunderdome", "mode": "Team Deathmatch", "image": "image/Team Deathmatch/Thunderdome.jpg"},
+        {"map": "Production Yard", "mode": "Control", "image": "image/Control/Production Yard.png"},
+        {"map": "Skull Town", "mode": "Gun Run", "image": "image/Gun Run/Skull Town.jpg"}
+    ]
+}
