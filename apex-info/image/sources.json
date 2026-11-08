@@ -1,0 +1,376 @@
+{
+  "source_page": "https://apexlegends.wiki.gg/wiki/Map",
+  "excluded_category": "Arenas",
+  "images": [
+    {
+      "category": "Battle Royale",
+      "name": "Kings Canyon",
+      "source_url": "https://apexlegends.wiki.gg/images/S14_kingscanyon_overview.jpg?5244eb",
+      "path": "Battle Royale/Kings Canyon.jpg",
+      "width": 3000,
+      "height": 1688,
+      "sha256": "6b1b64541a1f99b80477651bd8dbad79d9ab9a31eb3208a67cde567098f53d47",
+      "bytes": 7786796
+    },
+    {
+      "category": "Battle Royale",
+      "name": "World's Edge",
+      "source_url": "https://apexlegends.wiki.gg/images/S16_worldsedgeoverview.png?f0dc88",
+      "path": "Battle Royale/World's Edge.png",
+      "width": 1600,
+      "height": 900,
+      "sha256": "90650eeb44e8e590ec0e9a1533953f9ccde363b0362927fb844e305c2f233816",
+      "bytes": 3012813
+    },
+    {
+      "category": "Battle Royale",
+      "name": "Olympus",
+      "source_url": "https://apexlegends.wiki.gg/images/S9_olympus_overview.png?83bccc",
+      "path": "Battle Royale/Olympus.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "567bf80637b28f39d0f62835e4cd4e789f82646a41c70517f46c5a4b008936c6",
+      "bytes": 4485191
+    },
+    {
+      "category": "Battle Royale",
+      "name": "Storm Point",
+      "source_url": "https://apexlegends.wiki.gg/images/S19_stormpoint_overview_1.jpg?aa3906",
+      "path": "Battle Royale/Storm Point.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "0298a779d981b3b739d6c18940e5de626440af7275d0c7540a1503160cbd9f80",
+      "bytes": 826205
+    },
+    {
+      "category": "Battle Royale",
+      "name": "Broken Moon",
+      "source_url": "https://apexlegends.wiki.gg/images/S15_brokenmoon_overview3.jpg?d86afc",
+      "path": "Battle Royale/Broken Moon.jpg",
+      "width": 3840,
+      "height": 2160,
+      "sha256": "7cf6c4ee070716693217ee58d498c0795f863a817650e7352376cda13c5209e7",
+      "bytes": 4096974
+    },
+    {
+      "category": "Battle Royale",
+      "name": "E-District",
+      "source_url": "https://apexlegends.wiki.gg/images/S22_districtoverview_1.png?e5974e",
+      "path": "Battle Royale/E-District.png",
+      "width": 1600,
+      "height": 900,
+      "sha256": "b2e8a3cbbd72d65ea80df66d2a0defd08c96a2e8a30d68495e7d47d9e555e78a",
+      "bytes": 2975924
+    },
+    {
+      "category": "Control",
+      "name": "Thunderdome",
+      "source_url": "https://apexlegends.wiki.gg/images/S20_thunderdome_1.jpg?515ec0",
+      "path": "Control/Thunderdome.jpg",
+      "width": 3000,
+      "height": 1688,
+      "sha256": "2504142b71020edc84956ab176cd62fdb1593f764a81b909426e84f26ccda15b",
+      "bytes": 6593108
+    },
+    {
+      "category": "Control",
+      "name": "Barometer",
+      "source_url": "https://apexlegends.wiki.gg/images/S11_stormpoint_barometer.png?adb877",
+      "path": "Control/Barometer.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "909bffca66b3b29aaef442083c91599d7bbd335d4dbdc929b932df3664fa15ef",
+      "bytes": 4264484
+    },
+    {
+      "category": "Control",
+      "name": "Caustic Treatment",
+      "source_url": "https://apexlegends.wiki.gg/images/CausticTreatment_01.jpg?334b4f",
+      "path": "Control/Caustic Treatment.jpg",
+      "width": 1120,
+      "height": 630,
+      "sha256": "4a535ccfe011830669a1006e3cf68f8e5c903d2bf2b5881e382f75d9f2703c34",
+      "bytes": 201476
+    },
+    {
+      "category": "Control",
+      "name": "Hammond Labs",
+      "source_url": "https://apexlegends.wiki.gg/images/S7_Olympus_hammondlabs.jpg?be0c40",
+      "path": "Control/Hammond Labs.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "8e074ec16c52c5fcaa27ca93bee50bf3b962ca86dfd504e6fb0ef2d57051c2ce",
+      "bytes": 346065
+    },
+    {
+      "category": "Control",
+      "name": "Lava Siphon",
+      "source_url": "https://apexlegends.wiki.gg/images/Lava_Siphon.png?abba9b",
+      "path": "Control/Lava Siphon.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "e61009c4b5068c56d512ee924ce167605d18707e5cc2c378f418a860a89f323d",
+      "bytes": 3592598
+    },
+    {
+      "category": "Control",
+      "name": "Production Yard",
+      "source_url": "https://apexlegends.wiki.gg/images/S15_brokenmoon_productionyard.png?55c67e",
+      "path": "Control/Production Yard.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "6204cfda0f9ce1faf9c608ff5985001930f7685a9653813ec1cd4bd0dc44e155",
+      "bytes": 3088222
+    },
+    {
+      "category": "Gun Run",
+      "name": "Thunderdome",
+      "source_url": "https://apexlegends.wiki.gg/images/S20_thunderdome_1.jpg?515ec0",
+      "path": "Gun Run/Thunderdome.jpg",
+      "width": 3000,
+      "height": 1688,
+      "sha256": "2504142b71020edc84956ab176cd62fdb1593f764a81b909426e84f26ccda15b",
+      "bytes": 6593108
+    },
+    {
+      "category": "Gun Run",
+      "name": "Skull Town",
+      "source_url": "https://apexlegends.wiki.gg/images/Skull_Town.jpg?83b07e",
+      "path": "Gun Run/Skull Town.jpg",
+      "width": 1280,
+      "height": 721,
+      "sha256": "c970ad9341a978031c4ac3951c760c7418a0445a159b6b712ea9cb196bee16e3",
+      "bytes": 177098
+    },
+    {
+      "category": "Gun Run",
+      "name": "Autumn Estates",
+      "source_url": "https://apexlegends.wiki.gg/images/S7_Olympus_autumnestates.jpg?e53db3",
+      "path": "Gun Run/Autumn Estates.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "9142d6391fa2aef566f739a1585b4b24eda7fd7d62b84e8b2b28d1bc153e512e",
+      "bytes": 396355
+    },
+    {
+      "category": "Gun Run",
+      "name": "Fragment East",
+      "source_url": "https://apexlegends.wiki.gg/images/S17_monument_1.jpg?74c7f6",
+      "path": "Gun Run/Fragment East.jpg",
+      "width": 2560,
+      "height": 1440,
+      "sha256": "8eaa21f3d73f8554cc59dc03be238032825f4c6919f7eba032ebeb0d003641bd",
+      "bytes": 5645379
+    },
+    {
+      "category": "Gun Run",
+      "name": "Monument",
+      "source_url": "https://apexlegends.wiki.gg/images/S17_monument_2.jpg?715bf6",
+      "path": "Gun Run/Monument.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "a62c18abf8dad310f8158259d589eb2c251dcb611715bf3fa2036f427a9b9319",
+      "bytes": 454718
+    },
+    {
+      "category": "Gun Run",
+      "name": "Perpetual Core",
+      "source_url": "https://apexlegends.wiki.gg/images/S15_brokenmoon_perpetualcore.png?431aa5",
+      "path": "Gun Run/Perpetual Core.png",
+      "width": 1600,
+      "height": 900,
+      "sha256": "e519de8b0043370053dda15c49ed049ff5370abd9978fd34ce42ba5b63f2eeb5",
+      "bytes": 1970202
+    },
+    {
+      "category": "Gun Run",
+      "name": "Wattson's Pylon",
+      "source_url": "https://apexlegends.wiki.gg/images/S19_wattsonspylon_1.jpg?3fd5e7",
+      "path": "Gun Run/Wattson's Pylon.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "09257cd783a6ddf3f45b7744a4027ae8c66029635fd75e5dc95283f1f18bb2f5",
+      "bytes": 445586
+    },
+    {
+      "category": "Gun Run",
+      "name": "ZEUS Station",
+      "source_url": "https://apexlegends.wiki.gg/images/S19_zeusstation_1.jpg?38d88a",
+      "path": "Gun Run/ZEUS Station.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "7a9f1bbb6f48d7c7d88a080741855f78c0de9e2b88b1483842bfd59a0cf4dec3",
+      "bytes": 1650378
+    },
+    {
+      "category": "Gun Run",
+      "name": "The Wall",
+      "source_url": "https://apexlegends.wiki.gg/images/S11_stormpoint_thewall.jpg?7e6569",
+      "path": "Gun Run/The Wall.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "7ccd7b4339c38f21ae8617295b6f465a78ccc775118902f6fc176e5370ad4420",
+      "bytes": 1774078
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Thunderdome",
+      "source_url": "https://apexlegends.wiki.gg/images/S20_thunderdome_1.jpg?515ec0",
+      "path": "Team Deathmatch/Thunderdome.jpg",
+      "width": 3000,
+      "height": 1688,
+      "sha256": "2504142b71020edc84956ab176cd62fdb1593f764a81b909426e84f26ccda15b",
+      "bytes": 6593108
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Skull Town",
+      "source_url": "https://apexlegends.wiki.gg/images/Skull_Town.jpg?83b07e",
+      "path": "Team Deathmatch/Skull Town.jpg",
+      "width": 1280,
+      "height": 721,
+      "sha256": "c970ad9341a978031c4ac3951c760c7418a0445a159b6b712ea9cb196bee16e3",
+      "bytes": 177098
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Habitat 4",
+      "source_url": "https://apexlegends.wiki.gg/images/Habitat_02.jpg?45081b",
+      "path": "Team Deathmatch/Habitat 4.jpg",
+      "width": 1456,
+      "height": 819,
+      "sha256": "21bb94f2b985abe4f25f1a247341bdc60171d45c668c69b4648c59c19295f256",
+      "bytes": 322841
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Overflow",
+      "source_url": "https://apexlegends.wiki.gg/images/Overflow_5.jpg?7f0a75",
+      "path": "Team Deathmatch/Overflow.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "e7754104e2c89ed39c9c86d64330033464fdf907edeedd9a1786f97d705817c2",
+      "bytes": 426934
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Party Crasher",
+      "source_url": "https://apexlegends.wiki.gg/images/Arenas_Party_Crasher_03.jpg?259707",
+      "path": "Team Deathmatch/Party Crasher.jpg",
+      "width": 1456,
+      "height": 819,
+      "sha256": "52f9500826fe480ff4d69d3fd38985cf7def799cdd53c2546c9c078aa4e398c3",
+      "bytes": 245579
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Phase Runner",
+      "source_url": "https://apexlegends.wiki.gg/images/Arenas_Phase_Runner_01.jpg?e3f32f",
+      "path": "Team Deathmatch/Phase Runner.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "5691837dc3fb3f904c0e14a6c9048e843aacb9d0ef50470cad841b14e111417a",
+      "bytes": 524665
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Fragment East",
+      "source_url": "https://apexlegends.wiki.gg/images/S17_monument_1.jpg?74c7f6",
+      "path": "Team Deathmatch/Fragment East.jpg",
+      "width": 2560,
+      "height": 1440,
+      "sha256": "8eaa21f3d73f8554cc59dc03be238032825f4c6919f7eba032ebeb0d003641bd",
+      "bytes": 5645379
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Monument",
+      "source_url": "https://apexlegends.wiki.gg/images/S17_monument_2.jpg?715bf6",
+      "path": "Team Deathmatch/Monument.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "a62c18abf8dad310f8158259d589eb2c251dcb611715bf3fa2036f427a9b9319",
+      "bytes": 454718
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Perpetual Core",
+      "source_url": "https://apexlegends.wiki.gg/images/S15_brokenmoon_perpetualcore.png?431aa5",
+      "path": "Team Deathmatch/Perpetual Core.png",
+      "width": 1600,
+      "height": 900,
+      "sha256": "e519de8b0043370053dda15c49ed049ff5370abd9978fd34ce42ba5b63f2eeb5",
+      "bytes": 1970202
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "Wattson's Pylon",
+      "source_url": "https://apexlegends.wiki.gg/images/S19_wattsonspylon_1.jpg?3fd5e7",
+      "path": "Team Deathmatch/Wattson's Pylon.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "09257cd783a6ddf3f45b7744a4027ae8c66029635fd75e5dc95283f1f18bb2f5",
+      "bytes": 445586
+    },
+    {
+      "category": "Team Deathmatch",
+      "name": "ZEUS Station",
+      "source_url": "https://apexlegends.wiki.gg/images/S19_zeusstation_1.jpg?38d88a",
+      "path": "Team Deathmatch/ZEUS Station.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "7a9f1bbb6f48d7c7d88a080741855f78c0de9e2b88b1483842bfd59a0cf4dec3",
+      "bytes": 1650378
+    },
+    {
+      "category": "Lockdown",
+      "name": "Thunderdome",
+      "source_url": "https://apexlegends.wiki.gg/images/S20_thunderdome_1.jpg?515ec0",
+      "path": "Lockdown/Thunderdome.jpg",
+      "width": 3000,
+      "height": 1688,
+      "sha256": "2504142b71020edc84956ab176cd62fdb1593f764a81b909426e84f26ccda15b",
+      "bytes": 6593108
+    },
+    {
+      "category": "Lockdown",
+      "name": "Skull Town",
+      "source_url": "https://apexlegends.wiki.gg/images/Skull_Town.jpg?83b07e",
+      "path": "Lockdown/Skull Town.jpg",
+      "width": 1280,
+      "height": 721,
+      "sha256": "c970ad9341a978031c4ac3951c760c7418a0445a159b6b712ea9cb196bee16e3",
+      "bytes": 177098
+    },
+    {
+      "category": "Lockdown",
+      "name": "Monument",
+      "source_url": "https://apexlegends.wiki.gg/images/S17_monument_2.jpg?715bf6",
+      "path": "Lockdown/Monument.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "a62c18abf8dad310f8158259d589eb2c251dcb611715bf3fa2036f427a9b9319",
+      "bytes": 454718
+    },
+    {
+      "category": "Lockdown",
+      "name": "Perpetual Core",
+      "source_url": "https://apexlegends.wiki.gg/images/S15_brokenmoon_perpetualcore.png?431aa5",
+      "path": "Lockdown/Perpetual Core.png",
+      "width": 1600,
+      "height": 900,
+      "sha256": "e519de8b0043370053dda15c49ed049ff5370abd9978fd34ce42ba5b63f2eeb5",
+      "bytes": 1970202
+    },
+    {
+      "category": "Lockdown",
+      "name": "ZEUS Station",
+      "source_url": "https://apexlegends.wiki.gg/images/S19_zeusstation_1.jpg?38d88a",
+      "path": "Lockdown/ZEUS Station.jpg",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "7a9f1bbb6f48d7c7d88a080741855f78c0de9e2b88b1483842bfd59a0cf4dec3",
+      "bytes": 1650378
+    }
+  ]
+}
