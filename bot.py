@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from apex_rank import USAGE as RANK_USAGE, get_rank_rotation, parse_rank_time
 from apex_mixtape import USAGE as MIXTAPE_USAGE, get_mixtape_rotation, parse_mixtape_time
 from apex_images import prepare_apex_image
+from apex_lookup import ApexMapMatchError, get_next_apex_rotation
 from markdown_images import MarkdownImageStore
 from pvp import (BattlefieldMatchError, get_next_battlefield_rotation, get_today_battlefield,
                  parse_command, parse_predict_time, resolve_image_path)
@@ -73,25 +74,31 @@ class HelloBot(botpy.Client):
 
     async def _reply_rank(self, replies: ReplySession, arguments):
         await self._reply_apex_rotation(replies, arguments, label="排位地图", usage=RANK_USAGE,
-                                        parse_time=parse_rank_time, lookup=get_rank_rotation)
+                                        parse_time=parse_rank_time, lookup=get_rank_rotation,
+                                        config_name="rotation.json")
 
     async def _reply_mixtape(self, replies: ReplySession, arguments):
         await self._reply_apex_rotation(replies, arguments, label="混战地图", usage=MIXTAPE_USAGE,
-                                        parse_time=parse_mixtape_time, lookup=get_mixtape_rotation)
+                                        parse_time=parse_mixtape_time, lookup=get_mixtape_rotation,
+                                        config_name="mixtape.json")
 
-    async def _reply_apex_rotation(self, replies, arguments, *, label, usage, parse_time, lookup):
-        if len(arguments) > 1:
-            await replies.text(usage)
-            return
+    async def _reply_apex_rotation(self, replies, arguments, *, label, usage, parse_time, lookup,
+                                   config_name):
         when = None
-        if arguments:
+        query = " ".join(arguments)
+        by_name = bool(query) and not (query[:1].isdecimal() and "-" in query)
+        if arguments and not by_name:
             try:
-                when = parse_time(arguments[0])
+                when = parse_time(query)
             except ValueError as exc:
                 await replies.text(str(exc))
                 return
         try:
-            rotation = lookup(when)
+            rotation = (get_next_apex_rotation(query, config_name=config_name, lookup=lookup)
+                        if by_name else lookup(when))
+        except ApexMapMatchError as exc:
+            await replies.text(f"{exc}\n\n{usage}")
+            return
         except (OSError, ValueError, KeyError, TypeError, OverflowError) as exc:
             logger.error("读取%s信息失败：%s", label, exc)
             await replies.text(f"{label}信息暂不可用，请稍后再试。")
@@ -100,6 +107,11 @@ class HelloBot(botpy.Client):
             f"查询时间：{when:%Y-%m-%d %H:%M}（北京时间）\n\n此时{label}：")
         text = (f"{heading}{rotation['name']}\n\n"
                 f"{rotation['time_until_rotation']}后轮换至{rotation['next_name']}")
+        if by_name:
+            text = (f"{label}：{rotation['name']}\n\n"
+                    f"下次轮换：{rotation['next_rotation_time']:%Y-%m-%d %H:%M}（北京时间）")
+            if rotation["is_current"]:
+                text += "\n\n该地图当前正在进行，以上为下一次轮换到该地图的时间。"
         try:
             image = prepare_apex_image(Path(rotation["image"]))
         except (OSError, ValueError, KeyError) as exc:

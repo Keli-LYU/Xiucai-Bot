@@ -6,6 +6,7 @@
     },
     "E-District": {
         "zh-CN": "电气区",
+        "nickname": ["电力区域", "电力区"],
         "zh-TW": "電流區",
         "image": "image/Battle Royale/E-District.png"
     },

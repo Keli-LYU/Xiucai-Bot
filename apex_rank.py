@@ -9,7 +9,7 @@ from pathlib import Path
 from pvp import BEIJING
 
 DATA_DIR = Path(__file__).resolve().parent / "apex-info"
-USAGE = "用法：/rank 查询当前排位地图；/rank yyyy-mm-dd-hh 或 /rank yyyy-mm-dd-hh:mm 查询指定时间，年份支持两位简写，例如 /rank 26-11-08-23:30。时间为北京时间。"
+USAGE = "用法：/rank 查询当前排位地图；/rank 地图名称 查询下次轮换，例如 /rank 风暴点、/rank Storm Point；/rank yyyy-mm-dd-hh 或 /rank yyyy-mm-dd-hh:mm 查询指定时间，年份支持两位简写，例如 /rank 26-11-08-23:30。时间为北京时间。"
 
 
 def parse_rank_time(value: str, *, usage: str = USAGE) -> datetime:

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from apex_rank import DATA_DIR, parse_rank_time, resolve_apex_image_path
 from pvp import BEIJING
 
-USAGE = "用法：/mixtape 查询当前混战地图；/mixtape yyyy-mm-dd-hh 或 /mixtape yyyy-mm-dd-hh:mm 查询指定时间，年份支持两位简写，例如 /mixtape 26-11-08-20:45。时间为北京时间。"
+USAGE = "用法：/mixtape 查询当前混战地图；/mixtape 地图名称 查询下次轮换，例如 /mixtape 雷霆堡、/mixtape Skull Town；/mixtape yyyy-mm-dd-hh 或 /mixtape yyyy-mm-dd-hh:mm 查询指定时间，年份支持两位简写，例如 /mixtape 26-11-08-20:45。时间为北京时间。"
 MODE_NAMES = {"Team Deathmatch": "团队死斗", "Control": "控制", "Gun Run": "子弹时间"}
 
 
