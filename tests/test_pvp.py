@@ -16,6 +16,16 @@ from pvp import (BEIJING, DATA_DIR, BattlefieldMatchError, get_next_battlefield_
 
 
 class RotationTests(unittest.TestCase):
+    def test_predict_short_year_is_2000_to_2099_and_four_digit_year_is_unchanged(self):
+        for value, year in (("26-11-08-23", 2026), ("00-02-29-9", 2000),
+                            ("99-12-31-0", 2099), ("0026-11-08-23", 26)):
+            with self.subTest(value=value):
+                self.assertEqual(parse_predict_time(value).year, year)
+        self.assertEqual(parse_predict_time("28-02-29-9"), parse_predict_time("2028-02-29-9"))
+        for value in ("6-11-08-23", "026-11-08-23", "26-02-29-9"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                parse_predict_time(value)
+
     def test_predict_parses_beijing_hour_and_leap_day(self):
         self.assertEqual(parse_predict_time("2028-02-29-9"), datetime(2028, 2, 29, 9, tzinfo=BEIJING))
         self.assertEqual(parse_predict_time("2028-02-29-09"), parse_predict_time("2028-02-29-9"))
@@ -220,6 +230,15 @@ class ReplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("查询时间：2028-02-29 09:00（北京时间）", reply["markdown"]["content"])
         self.assertIn(f"此时战场：{self.battle['name']}", reply["markdown"]["content"])
         self.assertEqual(reply["msg_seq"], 2)
+
+    async def test_predict_short_year_replies_with_full_year_and_image(self):
+        self.group.content = "/predict 26-11-08-23"
+        with patch("bot.get_today_battlefield", return_value=self.battle) as lookup:
+            await self.client.on_group_at_message_create(self.group)
+        lookup.assert_called_once_with(datetime(2026, 11, 8, 23, tzinfo=BEIJING))
+        content = self.api.post_group_message.await_args.kwargs["markdown"]["content"]
+        self.assertIn("查询时间：2026-11-08 23:00（北京时间）", content)
+        self.assertIn("![战场图片 #800px #250px]", content)
 
     async def test_predict_alias_in_group_and_partial_name_in_private_chat(self):
         now = datetime(2026, 10, 22, 22, tzinfo=BEIJING)

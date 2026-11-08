@@ -17,10 +17,11 @@ from xiucai import choose_xiucai_image
 
 
 logger = logging.getLogger("hello_bot")
+XIUCAI_TRIGGER = True  # 固定附图开关；修改后重启机器人生效。
 
 
 class HelloBot(botpy.Client):
-    def __init__(self, *args, xiucai_trigger=True, **kwargs):
+    def __init__(self, *args, xiucai_trigger=XIUCAI_TRIGGER, **kwargs):
         super().__init__(*args, **kwargs)
         self.xiucai_trigger = xiucai_trigger
         self.markdown_images = None
@@ -59,11 +60,7 @@ class HelloBot(botpy.Client):
             self.markdown_images = MarkdownImageStore(self.http)
         replies = ReplySession(self.http, message, self._append_xiucai, self.markdown_images)
         command = parse_command(message.content)
-        if command == "/xiucai":
-            self.xiucai_trigger = not self.xiucai_trigger
-            status = "已开启" if self.xiucai_trigger else "已关闭"
-            await replies.text(f"xiucai_trigger：{status}")
-        elif command == "/pvp":
+        if command == "/pvp":
             await self._reply_pvp(replies)
         elif command.split()[:1] == ["/rank"]:
             await self._reply_rank(replies, command.split()[1:])
@@ -95,7 +92,7 @@ class HelloBot(botpy.Client):
 
     async def _reply_predict(self, replies: ReplySession, arguments):
         if len(arguments) != 1:
-            await replies.text("用法：/predict yyyy-mm-dd-hh 查询指定时刻；/predict 战场名称或昵称 查询下次轮换，例如 /predict cf、/predict 草原。时间为北京时间。")
+            await replies.text("用法：/predict yyyy-mm-dd-hh 查询指定时刻，年份支持两位简写（26=2026）；/predict 战场名称或昵称 查询下次轮换，例如 /predict cf、/predict 草原。时间为北京时间。")
             return
         query = arguments[0]
         if not (query[:1].isdecimal() and "-" in query):

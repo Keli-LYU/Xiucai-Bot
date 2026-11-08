@@ -36,10 +36,12 @@ def is_pvp_command(content: str | None) -> bool:
 
 def parse_predict_time(value: str) -> datetime:
     """将查询时间按北京时间的整点解析；小时支持一位或两位数字。"""
-    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{1,2}", value):
-        raise ValueError("格式：/predict yyyy-mm-dd-hh，例如 /predict 2026-10-28-23；时间为北京时间。")
+    if not re.fullmatch(r"(?:[0-9]{2}|[0-9]{4})-[0-9]{2}-[0-9]{2}-[0-9]{1,2}", value):
+        raise ValueError("格式：/predict yyyy-mm-dd-hh，年份可简写为两位，例如 /predict 26-10-28-23；时间为北京时间。")
     try:
         year, month, day, hour = map(int, value.split("-"))
+        if len(value.split("-", 1)[0]) == 2:
+            year += 2000
         return datetime(year, month, day, hour, tzinfo=BEIJING)
     except ValueError:
         raise ValueError("日期或小时无效，请输入有效日期，小时为 0–23，例如 /predict 2026-10-28-23。") from None

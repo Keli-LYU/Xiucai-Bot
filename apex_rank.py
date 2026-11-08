@@ -9,15 +9,17 @@ from pathlib import Path
 from pvp import BEIJING
 
 DATA_DIR = Path(__file__).resolve().parent / "apex-info"
-USAGE = "用法：/rank 查询当前排位地图；/rank yyyy-mm-dd-hh 或 /rank yyyy-mm-dd-hh:mm 查询指定时间，例如 /rank 2026-11-08-23:30。时间为北京时间。"
+USAGE = "用法：/rank 查询当前排位地图；/rank yyyy-mm-dd-hh 或 /rank yyyy-mm-dd-hh:mm 查询指定时间，年份支持两位简写，例如 /rank 26-11-08-23:30。时间为北京时间。"
 
 
 def parse_rank_time(value: str) -> datetime:
-    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{1,2}(?::[0-9]{2})?", value):
+    if not re.fullmatch(r"(?:[0-9]{2}|[0-9]{4})-[0-9]{2}-[0-9]{2}-[0-9]{1,2}(?::[0-9]{2})?", value):
         raise ValueError(USAGE)
     try:
         date, clock = value.rsplit("-", 1)
         year, month, day = map(int, date.split("-"))
+        if len(date.split("-", 1)[0]) == 2:
+            year += 2000
         hour, minute = map(int, (clock if ":" in clock else clock + ":00").split(":"))
         return datetime(year, month, day, hour, minute, tzinfo=BEIJING)
     except ValueError:

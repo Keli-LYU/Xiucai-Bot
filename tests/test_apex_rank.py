@@ -10,6 +10,17 @@ from bot import HelloBot
 
 
 class RankRotationTests(unittest.TestCase):
+    def test_short_year_with_optional_minutes_and_full_year_compatibility(self):
+        for value in ("26-11-08-23", "26-11-08-23:30", "28-02-29-9:05"):
+            with self.subTest(value=value):
+                self.assertEqual(parse_rank_time(value), parse_rank_time("20" + value))
+        self.assertEqual(parse_rank_time("00-02-29-0").year, 2000)
+        self.assertEqual(parse_rank_time("99-12-31-23:59").year, 2099)
+        self.assertEqual(parse_rank_time("0026-11-08-23").year, 26)
+        for value in ("6-11-08-23", "026-11-08-23", "26-02-29-9", "26-11-08-23:60"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                parse_rank_time(value)
+
     def test_boundaries_and_cycle(self):
         cases = [
             ("2026-11-08-18:30", "风暴点", "4小时30分钟0秒"),
@@ -58,6 +69,7 @@ class RankCommandTests(unittest.IsolatedAsyncioTestCase):
             self.assertIn("当前排位地图：风暴点", await send("<@!123> /rank"))
             query.assert_called_once_with(None)
         self.assertIn("此时排位地图：残月", await send("/rank 2026-11-09-03:30"))
+        self.assertIn("查询时间：2026-11-09 03:30（北京时间）", await send("/rank 26-11-09-03:30"))
         self.assertIn("日期或时间无效", await send("/rank 2026-11-08-24"))
         self.assertIn("用法：/rank", await send("/rank a b"))
         with patch.object(client, "_append_xiucai", new_callable=AsyncMock) as append:

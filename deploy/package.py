@@ -15,7 +15,7 @@ def package(destination, include_xiucai=True):
     files = [(path, path.name) for path in ROOT.glob("*.py")]
     for name in ("requirements.txt", "README.md"):
         files.append((ROOT / name, name))
-    for name in ("pvp-info", "秀才", "tests", "deploy"):
+    for name in ("pvp-info", "apex-info", "秀才", "tests", "deploy"):
         if name == "秀才" and not include_xiucai:
             continue
         files.extend((path, path.relative_to(ROOT).as_posix()) for path in (ROOT / name).rglob("*")

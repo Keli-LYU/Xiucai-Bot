@@ -5,7 +5,9 @@
 运行目录为 `/opt/qq-bot/current`，systemd 服务名为 `qq-bot`，运行用户为 `qqbot`。
 
 当前版本：`20261023T140953Z`，运行环境为 Python 3.10 虚拟环境。
-当前命令为 `/pvp`、`/predict 日期或战场名称` 和 `/xiucai`；本地验证包含 57 项测试。
+当前命令为 `/pvp`、`/predict 日期或战场名称` 和 `/rank [日期时间]`；本地验证包含 64 项测试。
+两种日期查询均支持两位年份（`00–99` 对应 `2000–2099`），四位年份保持原值。秀才附图固定读取 `bot.py` 中的代码常量 `XIUCAI_TRIGGER = True`；修改后重启生效，不再通过聊天命令切换。
+`/rank` 查询当前 Apex 排位地图；`/rank yyyy-mm-dd-hh` 或 `/rank yyyy-mm-dd-hh:mm` 查询指定北京时间，输出地图、下一地图及倒计时。轮换配置读取 `apex-info/info.json` 和 `apex-info/rotation.json`，使用文字回复并沿用秀才附图开关。
 `/predict yyyy-mm-dd-hh` 按北京时间查询指定日期整点的战场；`/predict cf`、`/predict 草原` 等名称查询返回该战场下一次轮换时间。使用 `info.json` 的 `name` 和 `nickname` 精确或部分匹配，多项匹配时提示候选，当前战场返回下一次重新入场的时间。
 成功的战场查询统一合并发送图片与文字；上传或图文发送失败时回退文字结果并记录警告日志。
 2026-10-23 22:27（北京时间）已确认 QQ 鉴权成功、机器人“秀才”上线并启动心跳，服务为 `enabled / active (running)`。
