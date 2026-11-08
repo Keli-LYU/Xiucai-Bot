@@ -8,6 +8,7 @@ import botpy
 from botpy.message import C2CMessage, GroupMessage, Message
 from dotenv import load_dotenv
 
+from apex_rank import USAGE as RANK_USAGE, get_rank_rotation, parse_rank_time
 from markdown_images import MarkdownImageStore
 from pvp import (BattlefieldMatchError, get_next_battlefield_rotation, get_today_battlefield,
                  parse_command, parse_predict_time, resolve_image_path)
@@ -64,8 +65,33 @@ class HelloBot(botpy.Client):
             await replies.text(f"xiucai_trigger：{status}")
         elif command == "/pvp":
             await self._reply_pvp(replies)
+        elif command.split()[:1] == ["/rank"]:
+            await self._reply_rank(replies, command.split()[1:])
         elif command.split()[:1] == ["/predict"]:
             await self._reply_predict(replies, command.split()[1:])
+
+    async def _reply_rank(self, replies: ReplySession, arguments):
+        if len(arguments) > 1:
+            await replies.text(RANK_USAGE)
+            return
+        when = None
+        if arguments:
+            try:
+                when = parse_rank_time(arguments[0])
+            except ValueError as exc:
+                await replies.text(str(exc))
+                return
+        try:
+            rotation = get_rank_rotation(when)
+        except (OSError, ValueError, KeyError, TypeError, OverflowError) as exc:
+            logger.error("读取排位地图信息失败：%s", exc)
+            await replies.text("排位地图信息暂不可用，请稍后再试。")
+            return
+        heading = "当前排位地图：" if when is None else (
+            f"查询时间：{when:%Y-%m-%d %H:%M}（北京时间）\n\n此时排位地图：")
+        await replies.text(
+            f"{heading}{rotation['name']}\n\n"
+            f"{rotation['time_until_rotation']}后轮换至{rotation['next_name']}")
 
     async def _reply_predict(self, replies: ReplySession, arguments):
         if len(arguments) != 1:

@@ -1,0 +1,6 @@
+{
+    "anchor_time": "2026-11-08T23:00:00+08:00",
+    "anchor_index": 1,
+    "interval_minutes": 270,
+    "order": ["Storm Point", "E-District", "Broken Moon"]
+}
